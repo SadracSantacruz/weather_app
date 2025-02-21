@@ -15,6 +15,7 @@ export default function WeatherPage() {
   const [weatherData, setWeatherData] = useState(null);
   const [forecastData, setForecastData] = useState(null);
   const [error, setError] = useState(null);
+  const [activeChart, setActiveChart] = useState("temperature"); // 🔥 Controls which chart is shown
 
   useEffect(() => {
     if (!city) return;
@@ -68,12 +69,34 @@ export default function WeatherPage() {
 
           {/* Chart Container */}
           <div className={styles.chartsContainer}>
-            <div className={styles.chartBox}>
+            {/* Toggle Buttons */}
+            <div className={styles.buttonGroup}>
+              <button
+                className={
+                  activeChart === "temperature"
+                    ? styles.activeButton
+                    : styles.button
+                }
+                onClick={() => setActiveChart("temperature")}
+              >
+                Temperature Trend
+              </button>
+              <button
+                className={
+                  activeChart === "wind" ? styles.activeButton : styles.button
+                }
+                onClick={() => setActiveChart("wind")}
+              >
+                Wind Speed Variations
+              </button>
+            </div>
+            {/* Show Only One Chart at a Time */}
+            {forecastData && activeChart === "temperature" && (
               <TemperatureChart data={forecastData} />
-            </div>
-            <div className={styles.chartBox}>
+            )}
+            {forecastData && activeChart === "wind" && (
               <WindSpeedChart data={forecastData} />
-            </div>
+            )}
           </div>
         </div>
       ) : (
