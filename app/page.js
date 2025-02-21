@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css"; // ✅ Ensure styles are imported correctly
+import USMap from "@/components/USMap";
 
 export default function Home() {
   const [city, setCity] = useState("");
@@ -15,18 +16,28 @@ export default function Home() {
 
   return (
     <main className={styles.container}>
-      <h1>Weather App</h1>
+      <h1 className={styles.title}>Weather App</h1>
+      <p className={styles.subtitle}>
+        Search for weather data or click on a state below:
+      </p>
+
+      {/* ✅ Search Bar */}
       <div className={styles.searchBox}>
         <input
           type="text"
           placeholder="Enter city name..."
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          className={styles.input} // ✅ Add missing class if needed
+          className={styles.input}
         />
         <button className={styles.button} onClick={handleSearch}>
           Search
         </button>
+      </div>
+
+      {/* ✅ US Choropleth Map Below Search */}
+      <div className={styles.mapContainer}>
+        <USMap />
       </div>
     </main>
   );
