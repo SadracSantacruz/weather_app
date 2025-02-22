@@ -6,9 +6,12 @@ body {
 }
 
 input {
-  padding: 10px;
+  padding: 12px 16px; /* Better padding for a larger input */
   border: 1px solid #ccc;
   border-radius: 5px;
+  font-size: 1.2rem; /* Make text inside input bigger */
+  width: 250px; /* Adjust this width as needed */
+  max-width: 100%;
 }
 
 h1 {

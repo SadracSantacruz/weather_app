@@ -8,7 +8,7 @@ import WindSpeedChart from "@/components/WindSpeedChart";
 // Styles
 import styles from "./page.module.css";
 
-const API_KEY = "202267e16383106641f061275bef8c46"; // 🔥 Replace with your actual API key
+const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 
 export default function WeatherPage() {
   const { city } = useParams();

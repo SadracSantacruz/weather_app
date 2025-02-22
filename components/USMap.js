@@ -1,48 +1,72 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import * as d3 from "d3";
+import { useRouter } from "next/navigation";
+import usStates from "./usStates";
 
-export default function USMap() {
-  const [geoJsonData, setGeoJsonData] = useState(null);
+export default function USMap({ geoJsonData }) {
   const chartRef = useRef();
-  const width = 800;
-  const height = 500;
-
-  // Projection
-  const projection = d3
-    .geoAlbersUsa()
-    .scale(1000)
-    .translate([width / 2, height / 2]);
+  const router = useRouter();
 
   useEffect(() => {
-    // ✅ Load the GeoJSON data
-    d3.json("/gz_2010_us_040_00_5m.json")
-      .then((data) => {
-        console.log("GeoJSON Loaded:", data);
-        setGeoJsonData(data);
-      })
-      .catch((error) => console.error("Error loading GeoJSON:", error));
-  }, []);
+    if (!geoJsonData || !geoJsonData.features) {
+      console.error("❌ geoJsonData is missing or invalid:", geoJsonData);
+      return;
+    }
 
-  useEffect(() => {
-    if (!geoJsonData) return; // ✅ Ensure the data is available
+    console.log("✅ geoJsonData Loaded:", geoJsonData); // Debugging
 
-    const svg = d3.select(chartRef.current);
+    const width = 800,
+      height = 500;
+
+    // Clear previous render
+    d3.select(chartRef.current).selectAll("*").remove();
+
+    const svg = d3
+      .select(chartRef.current)
+      .attr("width", width)
+      .attr("height", height);
+
+    const projection = d3.geoAlbersUsa().fitSize([width, height], geoJsonData);
+
+    // ✅ Prevent using a null projection
+    if (!projection) {
+      console.error("❌ Projection is NULL. Check geoJsonData:", geoJsonData);
+      return;
+    }
+
     const pathGenerator = d3.geoPath().projection(projection);
 
-    console.log("Projection:", projection);
-    console.log("GeoJSON Data:", geoJsonData);
-
+    // Draw states
     svg
+      .append("g")
       .selectAll("path")
       .data(geoJsonData.features)
       .enter()
       .append("path")
       .attr("d", pathGenerator)
-      .attr("fill", "#ccc")
-      .attr("stroke", "#333");
+      .attr("fill", "lightgray")
+      .attr("stroke", "black")
+      .attr("stroke-width", 0.5)
+      .on("mouseover", function () {
+        d3.select(this).attr("fill", "gray");
+      })
+      .on("mouseout", function () {
+        d3.select(this).attr("fill", "lightgray");
+      })
+      .on("click", (event, d) => {
+        const stateName = d.properties.NAME;
+        console.log("🖱 Clicked on:", stateName);
+        const city = usStates[stateName];
+        if (city) {
+          console.log(`🔀 Navigating to: /weather/${city}`);
+          router.push(`/weather/${city}`);
+        } else {
+          alert(`⚠ No data available for ${stateName}`);
+        }
+      });
 
-    // ✅ Add State Names at Centroids
+    // ✅ Fix state labels positioning
     svg
       .selectAll("text")
       .data(geoJsonData.features)
@@ -50,16 +74,16 @@ export default function USMap() {
       .append("text")
       .attr("x", (d) => {
         const centroid = d3.geoCentroid(d);
-        return projection(centroid) ? projection(centroid)[0] : 0;
+        return centroid && projection(centroid) ? projection(centroid)[0] : 0;
       })
       .attr("y", (d) => {
         const centroid = d3.geoCentroid(d);
-        return projection(centroid) ? projection(centroid)[1] : 0;
+        return centroid && projection(centroid) ? projection(centroid)[1] : 0;
       })
       .attr("text-anchor", "middle")
       .attr("font-size", "12px")
       .text((d) => d.properties.NAME);
-  }, [geoJsonData]); // ✅ Dependency added
+  }, [geoJsonData]);
 
-  return <svg ref={chartRef} width={width} height={height} />;
+  return <svg ref={chartRef} />;
 }

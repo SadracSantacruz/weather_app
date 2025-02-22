@@ -1,12 +1,25 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import styles from "./page.module.css"; // ✅ Ensure styles are imported correctly
+import styles from "./page.module.css";
 import USMap from "@/components/USMap";
 
 export default function Home() {
   const [city, setCity] = useState("");
   const router = useRouter();
+  const [geoJsonData, setGeoJsonData] = useState(null);
+
+  useEffect(() => {
+    console.log("Loading geoJsonData...");
+
+    fetch("/gz_2010_us_040_00_5m.json") // ✅ Fetch instead of import
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("GeoJSON Loaded:", data);
+        setGeoJsonData(data);
+      })
+      .catch((error) => console.error("Error loading GeoJSON:", error));
+  }, []);
 
   const handleSearch = () => {
     if (city.trim()) {
@@ -21,7 +34,6 @@ export default function Home() {
         Search for weather data or click on a state below:
       </p>
 
-      {/* ✅ Search Bar */}
       <div className={styles.searchBox}>
         <input
           type="text"
@@ -35,9 +47,12 @@ export default function Home() {
         </button>
       </div>
 
-      {/* ✅ US Choropleth Map Below Search */}
       <div className={styles.mapContainer}>
-        <USMap />
+        {geoJsonData ? (
+          <USMap geoJsonData={geoJsonData} />
+        ) : (
+          <p>Loading map...</p>
+        )}
       </div>
     </main>
   );
