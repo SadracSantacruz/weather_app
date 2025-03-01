@@ -19,17 +19,17 @@ export default function USMap({ geoJsonData }) {
     const width = 1000,
       height = 700;
 
-    // 🔹 Clear previous render (prevents duplication on re-renders)
+    // Clear previous render (prevents duplication on re-renders)
     d3.select(chartRef.current).selectAll("*").remove();
 
-    // 🔹 Create SVG and apply a soft background
+    // Create SVG and apply a soft background
     const svg = d3
       .select(chartRef.current)
       .attr("width", width)
       .attr("height", height)
       .style("background", "#f0f5fa"); // Soft blue-gray background
 
-    // 🔹 Set up the map projection and path generator
+    // Set up the map projection and path generator
     const projection = d3.geoAlbersUsa().fitSize([width, height], geoJsonData);
     if (!projection) {
       console.error("❌ Projection is NULL. Check geoJsonData:", geoJsonData);
@@ -38,12 +38,12 @@ export default function USMap({ geoJsonData }) {
 
     const pathGenerator = d3.geoPath().projection(projection);
 
-    // 🔹 Define a color scale (gradient from light blue to dark blue)
+    // Define a color scale (gradient from light blue to dark blue)
     const colorScale = d3
       .scaleSequential(d3.interpolateBlues)
       .domain([0, geoJsonData.features.length]);
 
-    // 🔹 Draw US States with dynamic color
+    // Draw US States with dynamic color
     const states = svg
       .append("g")
       .selectAll("path")
@@ -80,7 +80,7 @@ export default function USMap({ geoJsonData }) {
         }
       });
 
-    // 🔹 Add state labels (Names centered on each state)
+    // Add state labels (Names centered on each state)
     svg
       .selectAll("text")
       .data(geoJsonData.features)
@@ -100,7 +100,7 @@ export default function USMap({ geoJsonData }) {
       .style("pointer-events", "none") // Prevent text from blocking hover effect
       .text((d) => d.properties.NAME);
 
-    // 🔹 Define color legend properties
+    // Define color legend properties
     const legendHeight = 200;
     const legendWidth = 20;
     const legendX = width - 60; // Adjusted position further to the right
@@ -113,13 +113,13 @@ export default function USMap({ geoJsonData }) {
 
     const legendAxis = d3.axisRight(legendScale).ticks(6).tickSize(6);
 
-    // 🔹 Move the legend bar to better spacing
+    // Move the legend bar to better spacing
     const legend = svg
       .append("g")
       .attr("transform", `translate(${legendX}, ${legendY})`) // Adjusted position
       .call(legendAxis);
 
-    // 🔹 Create a gradient for the legend
+    // Create a gradient for the legend
     const gradient = svg
       .append("defs")
       .append("linearGradient")
@@ -140,7 +140,7 @@ export default function USMap({ geoJsonData }) {
       .attr("offset", (d) => d.offset)
       .attr("stop-color", (d) => d.color);
 
-    // 🔹 Add the legend gradient bar
+    // Add the legend gradient bar
     svg
       .append("rect")
       .attr("x", legendX - 25) // Move slightly left so it aligns with the axis
@@ -149,7 +149,7 @@ export default function USMap({ geoJsonData }) {
       .attr("height", legendHeight)
       .style("fill", "url(#legendGradient)");
 
-    // 🔹 Add label for the legend
+    // Add label for the legend
     svg
       .append("text")
       .attr("x", legendX - 30) // Move text along with the bar
