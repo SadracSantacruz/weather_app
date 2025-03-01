@@ -1,3 +1,4 @@
+/* 🌤️ Page Background */
 .container {
   display: flex;
   flex-direction: column;
@@ -5,34 +6,59 @@
   justify-content: center;
   text-align: center;
   padding: 30px;
-  font-family: "Arial", sans-serif;
-  background-color: #f4f7f8;
+  font-family: "Inter", sans-serif; /* Modern sans-serif for readability */
+  background: linear-gradient(
+    to bottom,
+    #0f172a,
+    #1e3a8a,
+    #3b82f6
+  ); /* Deep blue gradient */
+  color: #f1f5f9; /* Light text for contrast */
   min-height: 100vh;
 }
 
-/* Weather Section - Contains both details and charts */
+/* 🌆 City Name Header */
+.title {
+  font-family: "Playfair Display", serif; /* Elegant NY Times-style font */
+  font-size: 5rem;
+  color: #e0e7ff;
+  text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+  margin-bottom: 25px;
+}
+
+/* 🌡️ Weather Section - Contains both details and charts */
 .weatherSection {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   gap: 30px;
   width: 90%;
   max-width: 1200px;
 }
 
-/* Weather Details Card */
+/* 📌 Weather Details Card */
 .weatherDetails {
-  background: white;
+  background: rgba(255, 255, 255, 0.15); /* Frosted glass effect */
   padding: 25px;
   border-radius: 16px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
   max-width: 350px;
   text-align: left;
   font-size: 1.3rem;
+  color: #e0e7ff;
+  backdrop-filter: blur(10px); /* Smooth blurred effect */
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Charts Container */
+.weatherDetails p {
+  margin: 10px 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #f8fafc; /* Lighter text for readability */
+}
+
+/* 📊 Charts Container */
 .chartsContainer {
   display: flex;
   flex-direction: column;
@@ -41,17 +67,19 @@
   flex: 1;
 }
 
-/* Chart Box */
+/* 📉 Chart Box */
 .chartBox {
-  background: white;
+  background: rgba(255, 255, 255, 0.1); /* Slight transparency */
   padding: 20px;
   border-radius: 16px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
   width: 100%;
   max-width: 700px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Buttons */
+/* 📌 Buttons */
 .buttonGroup {
   display: flex;
   gap: 12px;
@@ -60,9 +88,9 @@
 
 .button {
   padding: 12px 18px;
-  border: 2px solid #0070f3;
+  border: 2px solid #60a5fa;
   background: none;
-  color: #0070f3;
+  color: #60a5fa;
   border-radius: 10px;
   cursor: pointer;
   font-size: 1.1rem;
@@ -70,35 +98,37 @@
 }
 
 .button:hover {
-  background: #0070f3;
+  background: #1e40af;
   color: white;
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
 }
 
 .activeButton {
   padding: 12px 18px;
-  border: 2px solid #0070f3;
-  background: #0070f3;
+  border: 2px solid #60a5fa;
+  background: #3b82f6;
   color: white;
   border-radius: 10px;
   cursor: pointer;
   font-size: 1.1rem;
 }
 
+/* 🔗 Back to Search Link */
 .link {
   display: inline-block;
   margin-top: 20px;
   text-decoration: none;
   font-size: 1.2rem;
   font-weight: bold;
-  color: #0070f3;
+  color: #93c5fd;
   transition: color 0.3s ease-in-out;
 }
 
 .link:hover {
-  color: #005bb5;
+  color: #60a5fa;
 }
 
-/* Make everything stack on small screens */
+/* 📱 Make everything stack on small screens */
 @media (max-width: 768px) {
   .weatherSection {
     flex-direction: column;
@@ -111,5 +141,9 @@
 
   .weatherDetails {
     font-size: 1.1rem;
+  }
+
+  .title {
+    font-size: 4rem;
   }
 }

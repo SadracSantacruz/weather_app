@@ -48,7 +48,7 @@ export default function WeatherPage() {
   }, [city]);
   return (
     <main className={styles.container}>
-      <h1>Weather in {decodeURIComponent(city)}</h1>
+      <h1 className="title">Weather in {decodeURIComponent(city)}</h1>
 
       {error ? (
         <p className={styles.error}>{error}</p>
