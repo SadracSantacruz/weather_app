@@ -12,7 +12,7 @@ export default function Home() {
   useEffect(() => {
     console.log("Loading geoJsonData...");
 
-    fetch("/gz_2010_us_040_00_5m.json") // ✅ Fetch instead of import
+    fetch("/gz_2010_us_040_00_5m.json") // Fetch instead of import
       .then((response) => response.json())
       .then((data) => {
         console.log("GeoJSON Loaded:", data);

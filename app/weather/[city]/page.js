@@ -15,7 +15,7 @@ export default function WeatherPage() {
   const [weatherData, setWeatherData] = useState(null);
   const [forecastData, setForecastData] = useState(null);
   const [error, setError] = useState(null);
-  const [activeChart, setActiveChart] = useState("temperature"); // 🔥 Controls which chart is shown
+  const [activeChart, setActiveChart] = useState("temperature"); // Controls which chart is shown
 
   useEffect(() => {
     if (!city) return;

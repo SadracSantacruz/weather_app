@@ -13,9 +13,9 @@ export default function WindSpeedChart({ data }) {
       speed: d.wind.speed,
     }));
 
-    const width = 500,
-      height = 300,
-      margin = { top: 20, right: 30, bottom: 30, left: 40 };
+    const width = 1000, // Increased width
+      height = 600, // Increased height
+      margin = { top: 80, right: 80, bottom: 90, left: 90 }; // More space for labels
 
     const svg = d3
       .select(chartRef.current)
