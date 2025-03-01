@@ -15,6 +15,7 @@ export default function RainfallCloudHeatmap({ data }) {
     // Extract relevant data (time, precipitation/cloud coverage)
     const formattedData = data.map((d) => ({
       time: new Date(d.dt * 1000),
+      type: d.rain ? "Rain" : "Cloudy",
       intensity: d.rain ? d.rain["1h"] || 0 : d.clouds.all, // Use rain if available, otherwise cloud coverage
     }));
 
@@ -43,10 +44,10 @@ export default function RainfallCloudHeatmap({ data }) {
       .scaleSequential(d3.interpolateBlues)
       .domain([0, d3.max(formattedData, (d) => d.intensity)]);
 
-    // Create Grid Rectangles
+    // Create Grid Rectangles with Animation
     const gridSize = width / formattedData.length;
 
-    svg
+    const bars = svg
       .selectAll("rect")
       .data(formattedData)
       .enter()
@@ -56,8 +57,48 @@ export default function RainfallCloudHeatmap({ data }) {
       .attr("width", gridSize)
       .attr("height", height)
       .attr("fill", (d) => colorScale(d.intensity))
-      .attr("opacity", 0.9)
-      .attr("stroke", "#1e3a8a");
+      .attr("opacity", 0)
+      .attr("stroke", "#1e3a8a")
+      .transition()
+      .duration(1000)
+      .delay((d, i) => i * 10) // Staggered delay for smooth effect
+      .attr("opacity", 0.9);
+
+    // Tooltip
+    const tooltip = d3
+      .select("body")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("background", "rgba(30, 58, 138, 0.9)")
+      .style("color", "#ffffff")
+      .style("padding", "8px 12px")
+      .style("border-radius", "5px")
+      .style("font-size", "14px")
+      .style("box-shadow", "0px 4px 8px rgba(0,0,0,0.3)")
+      .style("display", "none");
+
+    // Add Hover Interaction
+    svg
+      .selectAll("rect")
+      .on("mouseover", function (event, d) {
+        d3.select(this).transition().duration(200).attr("opacity", 1);
+        tooltip
+          .style("display", "block")
+          .html(
+            `<b>${d.type}</b><br>Time: ${d3.timeFormat("%H:%M")(d.time)}<br> ${
+              d.type === "Rain"
+                ? `Rainfall: ${d.intensity} mm`
+                : `Cloud Coverage: ${d.intensity}%`
+            }`
+          )
+          .style("left", `${event.pageX + 15}px`)
+          .style("top", `${event.pageY - 25}px`);
+      })
+      .on("mouseout", function () {
+        d3.select(this).transition().duration(200).attr("opacity", 0.9);
+        tooltip.style("display", "none");
+      });
 
     // X-Axis
     svg
@@ -151,7 +192,7 @@ export default function RainfallCloudHeatmap({ data }) {
       .style("font-size", "14px")
       .style("fill", "#f8fafc")
       .style("font-weight", "bold")
-      .text("Intensity Scale");
+      .text("Rainfall (mm) / Cloud Coverage (%)");
   }, [data]);
 
   return <svg ref={chartRef} />;

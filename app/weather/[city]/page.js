@@ -57,6 +57,13 @@ export default function WeatherPage() {
         <div className={styles.weatherSection}>
           {/* Weather Details Card */}
           <div className={styles.weatherDetails}>
+            <p style={{ textAlign: "center" }}>
+              <strong>Current Weather</strong>
+            </p>
+            {/* Align center */}
+            <p>
+              <strong>Weather:</strong> {weatherData.weather[0].description}
+            </p>
             <p>
               <strong>Temperature:</strong> {weatherData.main.temp}°C
             </p>
