@@ -74,6 +74,24 @@ button:hover {
   box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
 }
 
+.tooltip {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.85); /* Soft white background */
+  color: #1e293b; /* Darker text for contrast */
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  pointer-events: none; /* Prevents blocking interactions */
+  opacity: 0; /* Starts hidden */
+  transition: opacity 0.2s ease-in-out;
+}
+
+.tooltip.visible {
+  opacity: 1; /* Shows tooltip smoothly */
+}
+
 /* 🎨 Responsive Design */
 @media (max-width: 768px) {
   h1 {
