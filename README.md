@@ -1,8 +1,27 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Set Up you Open Weather Map account
+
+- You can access it here: https://openweathermap.org/
+
+### Obtain your API key
+
+- First you will have to sign, head over to `My API keys`, and create one!
+
 ## Getting Started
-For this, make sure that you have the latest version of NodeJS installed you can get it here 
+
+For this, make sure that you have the latest version of NodeJS installed you can get it here
 `(https://nodejs.org/en/download)`
+
+### Once you are in your root directory
+
+- On your root directory create a file named: `.env.local` which should contain the following code
+
+```python
+NEXT_PUBLIC_WEATHER_API_KEY=YourAPIKey
+```
+
+- You should be good to go
 
 First, run the development server:
 `npm init`
