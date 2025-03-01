@@ -8,15 +8,21 @@ export default function WindSpeedChart({ data }) {
   useEffect(() => {
     if (!data || !chartRef.current) return;
 
-    const windSpeeds = data.map((d) => ({
-      date: new Date(d.dt * 1000),
-      speed: d.wind.speed,
+    // Extract wind data properly
+    const windData = data.map((d) => ({
+      date: new Date(d.dt * 1000), // Convert UNIX timestamp to JS Date
+      speed: d.wind.speed, // Wind speed in m/s
+      direction: d.wind.deg, // Wind direction in degrees
     }));
 
-    const width = 1000, // Increased width
-      height = 600, // Increased height
-      margin = { top: 80, right: 80, bottom: 90, left: 90 }; // More space for labels
+    const width = 1000,
+      height = 600,
+      margin = { top: 80, right: 120, bottom: 90, left: 90 };
 
+    // Clear previous SVG (prevents duplication when re-rendering)
+    d3.select(chartRef.current).selectAll("*").remove();
+
+    // Create SVG
     const svg = d3
       .select(chartRef.current)
       .attr("width", width)
@@ -24,39 +30,170 @@ export default function WindSpeedChart({ data }) {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
+    // X Scale (Time)
     const x = d3
       .scaleTime()
-      .domain(d3.extent(windSpeeds, (d) => d.date))
+      .domain(d3.extent(windData, (d) => d.date))
       .range([0, width - margin.left - margin.right]);
 
+    // Y Scale (Wind Speed)
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(windSpeeds, (d) => d.speed) + 2])
+      .domain([0, d3.max(windData, (d) => d.speed) + 2])
       .range([height - margin.top - margin.bottom, 0]);
 
+    // Define Color Scale for Wind Speed
+    const colorScale = d3
+      .scaleSequential(d3.interpolateTurbo) // Interpolates from blue → green → yellow → red
+      .domain([0, d3.max(windData, (d) => d.speed)]);
+
+    // Title
     svg
       .append("text")
-      .attr("x", width / 2)
-      .attr("y", -10)
+      .attr("x", width / 2 - margin.left)
+      .attr("y", -20)
       .attr("text-anchor", "middle")
       .style("font-size", "16px")
-      .text("Wind Speed Variations");
+      .text("Wind Speed & Direction Over Time");
 
+    // Axes
     svg
       .append("g")
       .attr("transform", `translate(0,${height - margin.top - margin.bottom})`)
-      .call(d3.axisBottom(x));
+      .call(d3.axisBottom(x).ticks(6));
     svg.append("g").call(d3.axisLeft(y));
 
+    // Define arrow marker
     svg
-      .selectAll("circle")
-      .data(windSpeeds)
-      .enter()
-      .append("circle")
-      .attr("cx", (d) => x(d.date))
-      .attr("cy", (d) => y(d.speed))
-      .attr("r", 4)
+      .append("defs")
+      .append("marker")
+      .attr("id", "arrowhead")
+      .attr("viewBox", "0 0 10 10")
+      .attr("refX", 5)
+      .attr("refY", 5)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto-start-reverse")
+      .append("path")
+      .attr("d", "M 0 0 L 10 5 L 0 10 L 3 5 Z")
       .attr("fill", "red");
+
+    // Scale factor to adjust arrow length
+    const scaleFactor = 8; // Adjust this value if arrows are too big or too small
+
+    // Add arrows based on wind direction & speed
+    const arrows = svg
+      .selectAll("line")
+      .data(windData)
+      .enter()
+      .append("line")
+      .attr("x1", (d) => x(d.date))
+      .attr("y1", (d) => y(d.speed))
+      .attr(
+        "x2",
+        (d) =>
+          x(d.date) +
+          scaleFactor * d.speed * Math.sin((d.direction * Math.PI) / 180)
+      )
+      .attr(
+        "y2",
+        (d) =>
+          y(d.speed) -
+          scaleFactor * d.speed * Math.cos((d.direction * Math.PI) / 180)
+      )
+      .attr("stroke", (d) => colorScale(d.speed)) // Apply color based on wind speed
+      .attr("stroke-width", 2)
+      .attr("marker-end", "url(#arrowhead)");
+
+    // 🌬️ Animate arrows (pulsing movement to simulate wind)
+    function animateArrows() {
+      arrows
+        .transition()
+        .duration(1000)
+        .ease(d3.easeSinInOut)
+        .attr(
+          "x2",
+          (d) =>
+            x(d.date) +
+            (scaleFactor * d.speed + 3) *
+              Math.sin((d.direction * Math.PI) / 180)
+        )
+        .attr(
+          "y2",
+          (d) =>
+            y(d.speed) -
+            (scaleFactor * d.speed + 3) *
+              Math.cos((d.direction * Math.PI) / 180)
+        )
+        .transition()
+        .duration(1000)
+        .ease(d3.easeSinInOut)
+        .attr(
+          "x2",
+          (d) =>
+            x(d.date) +
+            (scaleFactor * d.speed - 3) *
+              Math.sin((d.direction * Math.PI) / 180)
+        )
+        .attr(
+          "y2",
+          (d) =>
+            y(d.speed) -
+            (scaleFactor * d.speed - 3) *
+              Math.cos((d.direction * Math.PI) / 180)
+        )
+        .on("end", animateArrows);
+    }
+
+    animateArrows();
+
+    // 📏 Add legend (color scale + arrow length)
+    const legendScale = d3
+      .scaleLinear()
+      .domain([0, d3.max(windData, (d) => d.speed)])
+      .range([height - 100, 50]);
+
+    const legendAxis = d3.axisRight(legendScale).ticks(5);
+
+    const legend = svg
+      .append("g")
+      .attr("transform", `translate(${width - margin.right - 20}, 0)`)
+      .call(legendAxis);
+
+    // Color gradient legend
+    const gradient = svg
+      .append("defs")
+      .append("linearGradient")
+      .attr("id", "legendGradient")
+      .attr("x1", "0%")
+      .attr("y1", "100%")
+      .attr("x2", "0%")
+      .attr("y2", "0%");
+
+    gradient
+      .selectAll("stop")
+      .data([
+        { offset: "0%", color: d3.interpolateTurbo(0) },
+        { offset: "100%", color: d3.interpolateTurbo(1) },
+      ])
+      .enter()
+      .append("stop")
+      .attr("offset", (d) => d.offset)
+      .attr("stop-color", (d) => d.color);
+
+    svg
+      .append("rect")
+      .attr("x", width - margin.right - 40)
+      .attr("y", 50)
+      .attr("width", 20)
+      .attr("height", height - 150)
+      .style("fill", "url(#legendGradient)");
+
+    svg
+      .append("text")
+      .attr("x", width - margin.right - 40)
+      .attr("y", 40)
+      .text("Wind Speed (m/s)");
   }, [data]);
 
   return <svg ref={chartRef} />;
