@@ -5,6 +5,7 @@ import Link from "next/link";
 // Charts
 import TemperatureChart from "@/components/TemperatureChart";
 import WindSpeedChart from "@/components/WindSpeedChart";
+import RainfallCloudHeatmap from "@/components/Rainfall_Cloud_Heatmap";
 // Styles
 import styles from "./page.module.css";
 
@@ -89,6 +90,16 @@ export default function WeatherPage() {
               >
                 Wind Speed Variations
               </button>
+              <button
+                className={
+                  activeChart === "rainfall"
+                    ? styles.activeButton
+                    : styles.button
+                }
+                onClick={() => setActiveChart("rainfall")}
+              >
+                Rainfall & Cloud Heatmap
+              </button>
             </div>
             {/* Show Only One Chart at a Time */}
             {forecastData && activeChart === "temperature" && (
@@ -96,6 +107,9 @@ export default function WeatherPage() {
             )}
             {forecastData && activeChart === "wind" && (
               <WindSpeedChart data={forecastData} />
+            )}
+            {forecastData && activeChart === "rainfall" && (
+              <RainfallCloudHeatmap data={forecastData} />
             )}
           </div>
         </div>
